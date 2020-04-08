@@ -1,0 +1,29 @@
+{% extends "master.twig" %}
+{% block content %}
+
+	<h1>Login</h1>
+
+	{% if responseMessage %}
+		<div class="alert alert-danger" role="alert">
+			<strong>{{ responseMessage }}</strong>
+		</div>
+	{% endif %}
+
+	<form method="post" action="/cursophp/auth" accept-charset="UTF-8">
+		<h3>
+			<label for="email">Email</label>
+		</h3>
+		<input id="loginName" type="email" name="email" autocomplete="off">
+
+		<h3>
+			<label for="password">Password</label>
+		</h3>
+		<input id="password" type="password" name="password" autocomplete="off">
+
+		<input type="submit" value="Login">
+
+		{% if errorMessage is defined %}
+			<p>{{ errorMessage }}</p>
+		{% endif %}
+	</form>
+{% endblock %}
