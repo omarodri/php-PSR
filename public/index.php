@@ -5,6 +5,8 @@ error_reporting(E_ALL);
 
 require_once '../vendor/autoload.php';
 
+session_start();
+
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Aura\Router\RouterContainer;
 
@@ -40,19 +42,23 @@ $map->get('index','/cursophp/',[
 ]);
 $map->get('addJobs','/cursophp/jobs/add',[
     'controller' => 'App\Controllers\JobsController',
-    'action' => 'getAddJobAction'
+    'action' => 'getAddJobAction',
+    'auth' => true
 ]);
 $map->post('saveJobs','/cursophp/jobs/add',[
     'controller' => 'App\Controllers\JobsController',
-    'action' => 'getAddJobAction'
+    'action' => 'getAddJobAction',
+    'auth' => true
 ]);
 $map->get('addUser','/cursophp/user/add',[
     'controller' => 'App\Controllers\UsersController',
-    'action' => 'getAddUserAction'
+    'action' => 'getAddUserAction',
+    'auth' => true
 ]);
 $map->post('saveUser','/cursophp/user/add',[
     'controller' => 'App\Controllers\UsersController',
-    'action' => 'getAddUserAction'
+    'action' => 'getAddUserAction',
+    'auth' => true
 ]);
 $map->get('loginForm','/cursophp/login',[
     'controller' => 'App\Controllers\AuthController',
@@ -61,6 +67,15 @@ $map->get('loginForm','/cursophp/login',[
 $map->post('auth','/cursophp/auth',[
     'controller' => 'App\Controllers\AuthController',
     'action' => 'postLogin'
+]);
+$map->get('admin','/cursophp/admin',[
+    'controller' => 'App\Controllers\AdminController',
+    'action' => 'getIndex',
+    'auth' => true
+]);
+$map->get('logout','/cursophp/logout',[
+    'controller' => 'App\Controllers\AuthController',
+    'action' => 'getLogout'
 ]);
 
 $matcher = $routerContainer->getMatcher();
@@ -72,10 +87,26 @@ if(!$route){
     $handlerData = $route->handler;
     $controllerName = $handlerData['controller'];
     $actionName = $handlerData['action'];
-    
+    $needsAuth = $handlerData['auth'] ?? false;
+
     $controller = new $controllerName;
-    $response = $controller->$actionName($request);
-    
+
+    $sessionUserId = $_SESSION['userId'] ?? null;
+    if($needsAuth && !$sessionUserId){
+        $response = $controller->renderHTML('login.twig',[
+            'responseMessage' => 'Access Denied. You have to login first'
+            ]);  
+    }else{
+        $response = $controller->$actionName($request);
+    }
+
+    foreach ($response->getHeaders() as $name => $values) {
+        foreach ($values as $value) {
+            header(sprintf('%s: %s', $name, $value), false);
+        }
+    }
+    http_response_code($response->getStatusCode());
+
     echo $response->getBody();
 }
 

@@ -3,6 +3,7 @@ namespace App\Controllers;
 
 use App\Models\User;
 use Respect\Validation\Validator as v;
+use Laminas\Diactoros\Response\RedirectResponse;
 
 class AuthController extends BaseController {
 
@@ -23,10 +24,12 @@ class AuthController extends BaseController {
 
                 if ($user){
                     if(\password_verify($postData['password'], $user->password)){
-                        echo 'correct';
+                        
+                        $_SESSION['userId'] = $user->id;
+                        return new RedirectResponse('/cursophp/admin'); 
                     }
                     else {
-                            $responseMessage = "Wrong User Name or password. Try again.";                        
+                            $responseMessage = "Wrong credentials. Try again.";                        
                     }
                 }
                 else {
@@ -40,5 +43,12 @@ class AuthController extends BaseController {
                 'responseMessage'=>$responseMessage
             ]);    
         }
+    }
+
+    public function getLogout(){
+        unset($_SESSION['userId']);
+        return $this->renderHTML('login.twig',[
+            'responseMessageLogout'=> 'Logout successful'
+        ]);   
     }
 }

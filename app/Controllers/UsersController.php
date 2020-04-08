@@ -32,6 +32,8 @@ class UsersController extends BaseController {
         }
         
         return $this->renderHTML('addUser.twig',[
-                    'responseMessage'=>$responseMessage
-        ]);    }
+                    'responseMessage'=>$responseMessage,
+                    'admin' => 1
+        ]);    
+    }
 }

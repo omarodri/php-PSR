@@ -5,6 +5,7 @@ use App\Models\Job;
 use Respect\Validation\Validator as v;
 
 class JobsController extends BaseController {
+    
     public function getAddJobAction($request){
 
         $responseMessage = '';
@@ -41,6 +42,8 @@ class JobsController extends BaseController {
         }
         
         return $this->renderHTML('addJob.twig',[
-                    'responseMessage'=>$responseMessage
-        ]);    }
+                    'responseMessage'=>$responseMessage,
+                    'admin' => 1
+        ]);    
+    }
 }

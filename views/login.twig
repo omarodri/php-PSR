@@ -8,6 +8,11 @@
 			<strong>{{ responseMessage }}</strong>
 		</div>
 	{% endif %}
+	{% if responseMessageLogout %}
+		<div class="alert alert-success" role="alert">
+			<strong>{{ responseMessageLogout }}</strong>
+		</div>
+	{% endif %}
 
 	<form method="post" action="/cursophp/auth" accept-charset="UTF-8">
 		<h3>
